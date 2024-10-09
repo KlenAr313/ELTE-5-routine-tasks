@@ -2,6 +2,7 @@
 bin/
 obj/
 .idea/
+*.bin
 
 junit5all.jar
 Java/**/*.class
