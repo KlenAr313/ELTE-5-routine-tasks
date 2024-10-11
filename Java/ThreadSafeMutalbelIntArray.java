@@ -18,17 +18,18 @@ public class ThreadSafeMutalbelIntArray
         }
     }
 
+    public static Thread[] threads = new Thread[5];
     public static void main(String[] args)
     {
-        int[] a = {1,2,3,4};
+        int[] a = {1,2,3,4,5};
         ThreadSafeMutalbelIntArray array = new ThreadSafeMutalbelIntArray(a);
-        public static Thread[] threads = new Thread[5];
         for(int j = 0; j< 5; ++j)
         {
             final int ind = j;
-            threads[i] = new Thread(()->{
+            threads[j] = new Thread(()->{
                 System.out.print(array.get(ind));
             });
+            threads[j].start();
         }
     }
 }
