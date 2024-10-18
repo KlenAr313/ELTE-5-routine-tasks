@@ -6,3 +6,11 @@ obj/
 
 junit5all.jar
 Java/**/*.class
+
+
+*.exe
+*.o
+
+.vscode/
+
+x64/
