@@ -19,6 +19,7 @@ public class Dog implements Animal{
         ArrayList<IntPair> ways = new ArrayList<IntPair>();
         Random rand = new Random();
         while(!escaped) {
+            ways.clear();
             try{
                 synchronized (farm.farm) {
                     if(farm.farm[x+1][y].isAvailableForDog() && farm.farm[x+1][y].isEmpty()) ways.add(new IntPair(x+1,y)); //up
@@ -30,7 +31,7 @@ public class Dog implements Animal{
                     if(ways.size() > 0)
                         Switch(new IntPair(x,y), ways.get(rand.nextInt(ways.size())), farm);
                 }
-                ways.clear();
+
                 Thread.sleep(waitTime);
             }
             catch(InterruptedException e){
@@ -52,7 +53,7 @@ public class Dog implements Animal{
     }
 
     @Override
-    public boolean IsDog() {
+    public boolean isDog() {
         return true;
     }
 

@@ -22,7 +22,7 @@ public class Farm {
     }
 
     public Farm() {
-        Create(14,14,5,10, 500);
+        Create(14,14,5,10, 200);
     }
 
     private void Create(int length, int width, int dogCount, int sheepCount, int waitTime) {
@@ -88,6 +88,7 @@ public class Farm {
     }
 
     public void StartFarm() {
+        this.PrintFarm();
         animals.forEach(animal -> new Thread(() -> animal.Start(this)).start());
         while(!escaped){
             try {
@@ -99,7 +100,7 @@ public class Farm {
             }
         }
         animals.forEach(animal -> animal.SwitchEscapedStatus());
-        System.out.println(escaped);
+        this.PrintFarm();
     }
 
     public void SheepEscaped(char name){
