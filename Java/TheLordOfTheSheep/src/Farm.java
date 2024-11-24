@@ -17,7 +17,9 @@ public class Farm {
     public int minInnerLength;
     public int minInnerWidth;
 
-    public Farm(int length, int width, int dogCount, int sheepCount, int waitTime) {
+    public Farm(int length, int width, int dogCount, int sheepCount, int waitTime) throws Exception {
+        if((length - 2) % 3 != 0 || (width - 2) % 3 != 0 )
+            throw new Exception("Invalid length or width");
         Create(length, width, dogCount, sheepCount, waitTime);
     }
 

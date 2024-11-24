@@ -54,7 +54,7 @@ public class Sheep implements Animal {
                             Switch(new IntPair(x,y), ways.get(rand.nextInt(ways.size())), farm);
                     }
 
-                    if(x == 0 || y == 0 || x == farm.length - 1 || y == farm.length - 1) {
+                    if(x == 0 || y == 0 || x == farm.length - 1 || y == farm.width - 1) {
                         farm.SheepEscaped(name);
                         break;
                     }

@@ -22,6 +22,7 @@ public class Empty implements Tile {
 
     @Override
     public String toString() {
+        //return available ? " " : "-";
         return " ";
     }
 }
