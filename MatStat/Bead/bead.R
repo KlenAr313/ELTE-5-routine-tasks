@@ -12,4 +12,4 @@ fidesz = egyeni[(is.na(egyeni[, c('SZERVEZET')]) == 0 & egyeni[, c('SZERVEZET')]
 fidesz
 
 cleaned = cbind(telepules, fidesz)
-cleaned
+cleaned[0:5,]
