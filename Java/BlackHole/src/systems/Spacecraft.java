@@ -1,5 +1,5 @@
-import systems.PowerSupplier;
-import systems.SpacecraftData;
+package systems;
+
 import systems.primary.OxygenGenerator;
 import systems.secondary.CommunicationHandler;
 import systems.secondary.PropulsionController;
@@ -7,7 +7,7 @@ import systems.secondary.PropulsionController;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Spacecraft extends Thread{
+public class Spacecraft implements Runnable{
     private final ExecutorService systems;
     private PowerSupplier powerSupplier;
     private SpacecraftData spacecraftData;
@@ -34,12 +34,19 @@ public class Spacecraft extends Thread{
             systems.execute(oxygenGenerator);
             systems.execute(communicationHandler);
             systems.execute(propulsionController);
-            sleep(3000);
+            Thread.sleep(10000);
             systems.shutdownNow();
 
         }
-        catch (InterruptedException e) {
-            System.out.println("Spacecraft thread interrupted");
+        catch (Exception e) {
+            if(e instanceof InterruptedException){
+                systems.shutdownNow();
+            }
         }
+    }
+
+    public SpacecraftData status()
+    {
+        return spacecraftData;
     }
 }
