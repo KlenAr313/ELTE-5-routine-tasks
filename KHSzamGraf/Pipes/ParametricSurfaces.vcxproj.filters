@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{de539653-475b-4a5d-b931-486fb7b94e05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GL Utils">
+      <UniqueIdentifier>{86625e1e-e455-4eb5-8353-2412fe2eea1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{2647e48b-ba56-4089-91c3-4c7c3bfddc95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\SkyBox2">
+      <UniqueIdentifier>{4d528398-ae27-492f-beb0-4aaf690aca10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\SkyBox">
+      <UniqueIdentifier>{e4035def-68ba-45e0-9ff2-2a9fab676154}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PipeSystem">
+      <UniqueIdentifier>{30b0d287-cf3a-4438-9c1c-ad90cbb06a61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PipeSystem\Headers">
+      <UniqueIdentifier>{b91ae77a-8a01-409b-9b17-121046b73cac}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MyApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="includes\SDL_GLDebugMessageCallback.cpp">
+      <Filter>GL Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="includes\GLUtils.cpp">
+      <Filter>GL Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="includes\Camera.cpp">
+      <Filter>GL Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="includes\ObjParser.cpp">
+      <Filter>GL Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="includes\CameraManipulator.cpp">
+      <Filter>GL Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="PipeSystem\System.cpp">
+      <Filter>PipeSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="PipeSystem\Element.cpp">
+      <Filter>PipeSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="PipeSystem\Builder.cpp">
+      <Filter>PipeSystem</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MyApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\SDL_GLDebugMessageCallback.h">
+      <Filter>GL Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\GLUtils.hpp">
+      <Filter>GL Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\Camera.h">
+      <Filter>GL Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\ObjParser.h">
+      <Filter>GL Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\ParametricSurfaceMesh.hpp">
+      <Filter>GL Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\CameraManipulator.h">
+      <Filter>GL Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PipeSystem\System.h">
+      <Filter>PipeSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="PipeSystem\Element.h">
+      <Filter>PipeSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="PipeSystem\Builder.h">
+      <Filter>PipeSystem</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\Vert_PosNormTex.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Frag_Lighting.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Vert_Cylinder_PosNormTex.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Vert_Circle_PosNormTex.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Frag_skybox_skeleton.frag">
+      <Filter>Shaders\SkyBox</Filter>
+    </None>
+    <None Include="Shaders\Vert_skybox.vert">
+      <Filter>Shaders\SkyBox</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\color_checkerboard.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\earth-height-map.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\colorTex.jpg">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\cubemap.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\xneg.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\xpos.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\yneg.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\ypos.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\zneg.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+    <Image Include="Assets\SkyBox2\zpos.png">
+      <Filter>Assets\SkyBox2</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
