@@ -383,6 +383,12 @@ void CMyApp::Update( const SUpdateInfo& updateInfo )
 		pipeSystem.next();
 		prevActionTime = m_ElapsedTimeInSec;
 	}
+
+	if (m_needNewSystem)
+	{
+		pipeSystem = System(m_gridSize, 2);
+		m_needNewSystem = false;
+}
 }
 
 void CMyApp::Render()
@@ -696,11 +702,11 @@ void CMyApp::RenderGUI()
 	// ImGui::ShowDemoWindow();
 	if ( ImGui::Begin( "Lighting settings" ) )
 	{
-		ImGui::SeparatorText("Settings");
+		//ImGui::SeparatorText("Settings");
 		
 		//ImGui::SliderFloat("Shininess", &m_Shininess, 0.0001f, 10.0f );
-		ImGui::InputFloat("Shininess", &m_Shininess, 0.1f, 1.0f, "%.1f" );
-		static float Kaf = 1.0f;
+		//ImGui::InputFloat("Shininess", &m_Shininess, 0.1f, 1.0f, "%.1f" );
+		/*static float Kaf = 1.0f;
 		static float Kdf = 1.0f;
 		static float Ksf = 0.0f;
 		if ( ImGui::SliderFloat( "Ka", &Kaf, 0.0f, 1.0f ) )
@@ -718,7 +724,7 @@ void CMyApp::RenderGUI()
 
 		ImGui::SliderFloat( "Constant Attenuation", &m_lightConstantAttenuation, 0.001f, 2.0f );
 		ImGui::SliderFloat( "Linear Attenuation", &m_lightLinearAttenuation, 0.001f, 2.0f );
-		ImGui::SliderFloat( "Quadratic Attenuation", &m_lightQuadraticAttenuation, 0.001f, 2.0f );
+		ImGui::SliderFloat( "Quadratic Attenuation", &m_lightQuadraticAttenuation, 0.001f, 2.0f );*/
 
 		static glm::vec2 lightPosXZ = glm::vec2(0.0f);
 		lightPosXZ = glm::vec2(m_lightPos.x, m_lightPos.z);
@@ -739,6 +745,13 @@ void CMyApp::RenderGUI()
 		ImGui::LabelText("Light Position Y", "%f", m_lightPos.y);
 
 		ImGui::SliderFloat("Generation Time", &generationTime, 0.1f, 5.0f);
+
+		ImGui::DragInt("GridSize", &m_gridSize, 1.0F, 5, 128);
+
+		if (ImGui::Button("Reset"))
+		{
+			m_needNewSystem = true;
+		}
 	}
 
 	ImGui::End();

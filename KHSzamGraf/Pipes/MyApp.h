@@ -124,6 +124,8 @@ protected:
 	System pipeSystem = System(5, 2);
 	float prevActionTime = 0;
 	float generationTime = 1.0;
+	int m_gridSize = 5;
+	bool m_needNewSystem{ false };
 
 	//FBO
 	bool m_frameBufferCreated{ false }; 	//Korábban hoztunk már létre FBO-t?
