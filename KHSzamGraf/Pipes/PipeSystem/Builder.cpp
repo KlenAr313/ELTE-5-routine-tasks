@@ -62,7 +62,7 @@ Builder::Builder(std::vector<bool>& availability, int gridSize, std::vector<Elem
 		}
 		else
 		{
-			Element* e = new Element(px, py, pz, 0, 0, 0, color, true, true, true); //begin can't continue
+			Element* e = new Element(px, py, pz, 1, 1, 1, color, true, true, true); //begin can't continue
 			freshElements.push_back(e);
 			canContinue = false;
 		}
@@ -131,7 +131,7 @@ bool Builder::next()
 		}
 		else
 		{
-			Element* e = new Element(px, py, pz, 0, 0, 0, color, true, false, true, pfx, pfy, pfz); //end, can't continue
+			Element* e = new Element(px, py, pz, 1, 1, 1, color, true, false, true, pfx, pfy, pfz); //end, can't continue
 			//TODO cannot pushback e; Seems solved don't know why
 			freshElements.push_back(e);
 			return false;
