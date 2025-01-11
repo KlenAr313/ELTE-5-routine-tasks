@@ -77,7 +77,24 @@ void System::next()
 
 System::~System()
 {
-	//TODO clear heap
+	for (int i = 0; i < builders.size(); ++i)
+	{
+		delete(builders[i]);
+		builders[i] = nullptr;
+	}
+
+	for (int i = 0; i < freshElements.size(); ++i)
+	{
+		delete(freshElements[i]);
+		freshElements[i] = nullptr;
+	}
+
+	for (int i = 0; i < elements.size(); ++i)
+	{
+		delete(elements[i]);
+		elements[i] = nullptr;
+	}
+
 }
 
 glm::vec3 System::colorRandomiser()

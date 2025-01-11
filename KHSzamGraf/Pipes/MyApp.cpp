@@ -380,15 +380,17 @@ void CMyApp::Update( const SUpdateInfo& updateInfo )
 
 	if (m_ElapsedTimeInSec - prevActionTime > generationTime)
 	{
-		pipeSystem.next();
+		pipeSystem->next();
 		prevActionTime = m_ElapsedTimeInSec;
 	}
 
 	if (m_needNewSystem)
 	{
-		pipeSystem = System(m_gridSize, 2);
+		delete(pipeSystem);
+		pipeSystem = new System(m_gridSize, 2);
 		m_needNewSystem = false;
-}
+		m_needFreshFboByLight = true;
+	}
 }
 
 void CMyApp::Render()
@@ -401,7 +403,7 @@ void CMyApp::Render()
 		// ... és a mélységi Z puffert (GL_DEPTH_BUFFER_BIT)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		for (auto element : pipeSystem.elements)
+		for (auto element : pipeSystem->elements)
 		{
 			if (element->isSphere)
 			{
@@ -424,7 +426,7 @@ void CMyApp::Render()
 	}
 
 
-	for (auto element : pipeSystem.freshElements)
+	for (auto element : pipeSystem->freshElements)
 	{
 		if (element->isSphere)
 		{
@@ -744,7 +746,7 @@ void CMyApp::RenderGUI()
 		}
 		ImGui::LabelText("Light Position Y", "%f", m_lightPos.y);
 
-		ImGui::SliderFloat("Generation Time", &generationTime, 0.1f, 5.0f);
+		ImGui::SliderFloat("Generation Time", &generationTime, 0.001f, 5.0f);
 
 		ImGui::DragInt("GridSize", &m_gridSize, 1.0F, 5, 128);
 

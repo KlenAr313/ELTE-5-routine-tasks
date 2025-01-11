@@ -121,7 +121,7 @@ protected:
 	void CleanTextures();
 
 	//Pipe System
-	System pipeSystem = System(5, 2);
+	System* pipeSystem = new System(5, 2);
 	float prevActionTime = 0;
 	float generationTime = 1.0;
 	int m_gridSize = 5;

@@ -7,6 +7,8 @@
 Builder::Builder(std::vector<bool>& availability, int gridSize, std::vector<Element*>& freshElements, glm::vec3 col, bool& canContinue, bool& noMoreSpace)
 	:availability(availability), gridSize(gridSize), freshElements(freshElements)
 {
+
+	std::srand(std::time(nullptr));
 	this->color = glm::vec3(col);
 	std::vector<int> possAvail;
 	for (int i = 0; i < availability.size(); ++i)
@@ -84,8 +86,7 @@ bool Builder::next()
 	py += fy;
 	pz += fz;
 
-	std::srand(std::time(nullptr));
-	if (std::rand() % 100 < 15 || !isIn(px + fx) || !isIn(py + fy) || !isIn(pz + fz) || !availability[toIndex(px + fx, py + fy, pz + fz)])
+	if (std::rand() % 100 < 30 || !isIn(px + fx) || !isIn(py + fy) || !isIn(pz + fz) || !availability[toIndex(px + fx, py + fy, pz + fz)])
 	{
 		std::vector<glm::vec3> ways;
 		if (isIn(px + 1) && availability[toIndex(px + 1, py, pz)])
