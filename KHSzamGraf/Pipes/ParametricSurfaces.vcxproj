@@ -82,6 +82,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="includes\ProgramBuilder.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="includes\SDL_GLDebugMessageCallback.cpp" />
     <ClCompile Include="main.cpp" />
@@ -94,6 +95,7 @@
     <ClCompile Include="PipeSystem\System.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\ProgramBuilder.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="includes\SDL_GLDebugMessageCallback.h" />
     <ClInclude Include="includes\GLUtils.hpp" />
@@ -106,9 +108,11 @@
     <ClInclude Include="PipeSystem\System.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\Frag_Postprocess.frag" />
     <None Include="Shaders\Frag_skybox_skeleton.frag" />
     <None Include="Shaders\Vert_Circle_PosNormTex.vert" />
     <None Include="Shaders\Vert_Cylinder_PosNormTex.vert" />
+    <None Include="Shaders\Vert_FullScreen.vert" />
     <None Include="Shaders\Vert_PosNormTex.vert" />
     <None Include="Shaders\Frag_Lighting.frag" />
     <None Include="Shaders\Vert_skybox.vert" />

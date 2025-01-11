@@ -77,7 +77,8 @@ protected:
 	GLuint m_Sphere_programID = 0; // Gömbök programja
 	GLuint m_Cylinder_programID = 0; // Hengerek programja
 	GLuint m_Circle_programID = 0; // Körlap programja
-	GLuint m_programSkyboxID = 0;
+	GLuint m_programSkyboxID = 0; // Skybox programja
+	GLuint m_programPostprocessID = 0; // Postprocesss programja
 
 	// Fényforrás- ...
 	glm::vec4 m_lightPos = glm::vec4( 0.48f, 1.1f, 0.9f, 0.0f );
@@ -123,5 +124,22 @@ protected:
 	System pipeSystem = System(5, 2);
 	float prevActionTime = 0;
 	float generationTime = 1.0;
+
+	//FBO
+	bool m_frameBufferCreated{ false }; 	//Korábban hoztunk már létre FBO-t?
+	GLuint m_depthBuffer;               	//FBO Mélységbuffer textúra azonosító
+	GLuint m_colorBuffer;               	//FBO Színbuffer textúra azonosító
+	GLuint m_frameBuffer;               	//FBO azonosító
+
+	// Framebuffer initialization and termination
+	void InitFrameBufferObject();
+	void CleanFrameBufferObject();
+	void InitResolutionDependentResources(int, int);
+	void CleanResolutionDependentResources();
+
+	bool m_needFreshFboByKey{true};
+	bool m_start{ true };
+	bool m_needFreshFboByMouse{true};
+	bool m_needFreshFboByLight{true};
 };
 

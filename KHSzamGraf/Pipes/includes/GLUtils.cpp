@@ -228,3 +228,128 @@ void CleanOGLObject( OGLObject& ObjectGPU )
 	glDeleteVertexArrays(1, &ObjectGPU.vaoID);
 	ObjectGPU.vaoID = 0;
 }
+
+static void loadShaderCode(std::string& shaderCode, const std::filesystem::path& _fileName)
+{
+	// shaderkod betoltese _fileName fajlbol
+	shaderCode = "";
+
+	// _fileName megnyitasa
+	std::ifstream shaderStream(_fileName);
+	if (!shaderStream.is_open())
+	{
+		SDL_LogMessage(SDL_LOG_CATEGORY_ERROR,
+			SDL_LOG_PRIORITY_ERROR,
+			"Error while opening shader code file %s!", _fileName.string().c_str());
+		return;
+	}
+
+	// file tartalmanak betoltese a shaderCode string-be
+	std::string line = "";
+	while (std::getline(shaderStream, line))
+	{
+		shaderCode += line + "\n";
+	}
+
+	shaderStream.close();
+}
+
+
+GLuint AttachShader(const GLuint programID, GLenum shaderType, const std::filesystem::path& _fileName)
+{
+	// shaderkod betoltese _fileName fajlbol
+	std::string shaderCode;
+	loadShaderCode(shaderCode, _fileName);
+
+	return AttachShaderCode(programID, shaderType, shaderCode);
+}
+
+GLuint AttachShaderCode(const GLuint programID, GLenum shaderType, std::string_view shaderCode)
+{
+	if (programID == 0)
+	{
+		SDL_LogMessage(SDL_LOG_CATEGORY_ERROR,
+			SDL_LOG_PRIORITY_ERROR,
+			"Program needs to be inited before loading!");
+		return 0;
+	}
+
+	// shader letrehozasa
+	GLuint shaderID = glCreateShader(shaderType);
+
+	// kod hozzarendelese a shader-hez
+	const char* sourcePointer = shaderCode.data();
+	GLint sourceLength = static_cast<GLint>(shaderCode.length());
+
+	glShaderSource(shaderID, 1, &sourcePointer, &sourceLength);
+
+	// shader leforditasa
+	glCompileShader(shaderID);
+
+	// ellenorizzuk, h minden rendben van-e
+	GLint result = GL_FALSE;
+	int infoLogLength;
+
+	// forditas statuszanak lekerdezese
+	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
+	glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+	if (GL_FALSE == result || infoLogLength != 0)
+	{
+		// hibauzenet elkerese es kiirasa
+		std::string ErrorMessage(infoLogLength, '\0');
+		glGetShaderInfoLog(shaderID, infoLogLength, NULL, ErrorMessage.data());
+
+		SDL_LogMessage(SDL_LOG_CATEGORY_ERROR,
+			(result) ? SDL_LOG_PRIORITY_WARN : SDL_LOG_PRIORITY_ERROR,
+			"[glCompileShader]: %s", ErrorMessage.data());
+	}
+
+	// shader hozzarendelese a programhoz
+	glAttachShader(programID, shaderID);
+
+	return shaderID;
+
+}
+
+void LinkProgram(const GLuint programID, bool OwnShaders)
+{
+	// illesszük össze a shadereket (kimenő-bemenő változók összerendelése stb.)
+	glLinkProgram(programID);
+
+	// linkeles ellenorzese
+	GLint infoLogLength = 0, result = 0;
+
+	glGetProgramiv(programID, GL_LINK_STATUS, &result);
+	glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &infoLogLength);
+	if (GL_FALSE == result || infoLogLength != 0)
+	{
+		std::string ErrorMessage(infoLogLength, '\0');
+		glGetProgramInfoLog(programID, infoLogLength, nullptr, ErrorMessage.data());
+		SDL_LogMessage(SDL_LOG_CATEGORY_ERROR,
+			(result) ? SDL_LOG_PRIORITY_WARN : SDL_LOG_PRIORITY_ERROR,
+			"[glLinkProgram]: %s", ErrorMessage.data());
+	}
+
+	// Ebben az esetben a program objektumhoz tartozik a shader objektum.
+	// Vagyis a shader objektumokat ki tudjuk "törölni".
+	// Szabvány szerint (https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteShader.xhtml)
+	// a shader objektumok csak akkor törlődnek, ha nincsennek hozzárendelve egyetlen program objektumhoz sem.
+	// Vagyis mikor a program objektumot töröljük, akkor törlődnek a shader objektumok is.
+	if (OwnShaders)
+	{
+		// kerjuk le a program objektumhoz tartozó shader objektumokat, ...
+		GLint attachedShaders = 0;
+		glGetProgramiv(programID, GL_ATTACHED_SHADERS, &attachedShaders);
+		std::vector<GLuint> shaders(attachedShaders);
+
+		glGetAttachedShaders(programID, attachedShaders, nullptr, shaders.data());
+
+		// ... es "toroljuk" oket
+		for (GLuint shader : shaders)
+		{
+			glDeleteShader(shader);
+		}
+
+	}
+}

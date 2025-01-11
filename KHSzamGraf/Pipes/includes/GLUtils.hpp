@@ -119,3 +119,6 @@ template <typename VertexT>
 
 void CleanOGLObject( OGLObject& ObjectGPU );
 
+GLuint AttachShader(const GLuint programID, GLenum shaderType, const std::filesystem::path& _fileName);
+GLuint AttachShaderCode(const GLuint programID, GLenum shaderType, std::string_view shaderCode);
+void LinkProgram(const GLuint programID, bool OwnShaders = true);

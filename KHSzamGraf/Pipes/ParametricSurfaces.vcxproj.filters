@@ -34,6 +34,9 @@
     <Filter Include="PipeSystem\Headers">
       <UniqueIdentifier>{b91ae77a-8a01-409b-9b17-121046b73cac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\PostProcess">
+      <UniqueIdentifier>{17dcd4e3-bdbe-462f-83ca-8d4be30486ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyApp.cpp">
@@ -65,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="PipeSystem\Builder.cpp">
       <Filter>PipeSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="includes\ProgramBuilder.cpp">
+      <Filter>GL Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +104,9 @@
     <ClInclude Include="PipeSystem\Builder.h">
       <Filter>PipeSystem</Filter>
     </ClInclude>
+    <ClInclude Include="includes\ProgramBuilder.h">
+      <Filter>GL Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Vert_PosNormTex.vert">
@@ -117,6 +126,12 @@
     </None>
     <None Include="Shaders\Vert_skybox.vert">
       <Filter>Shaders\SkyBox</Filter>
+    </None>
+    <None Include="Shaders\Frag_Postprocess.frag">
+      <Filter>Shaders\PostProcess</Filter>
+    </None>
+    <None Include="Shaders\Vert_FullScreen.vert">
+      <Filter>Shaders\PostProcess</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -2,11 +2,13 @@
 #include "SDL_GLDebugMessageCallback.h"
 #include "ObjParser.h"
 #include "ParametricSurfaceMesh.hpp"
+#include "ProgramBuilder.h"
 
 #include <imgui.h>
 
 CMyApp::CMyApp()
 {
+
 }
 
 CMyApp::~CMyApp()
@@ -39,6 +41,12 @@ void CMyApp::InitShaders()
 
 	m_programSkyboxID = glCreateProgram();
 	AssembleProgram(m_programSkyboxID, "Shaders/Vert_skybox.vert", "Shaders/Frag_skybox_skeleton.frag");
+
+	m_programPostprocessID = glCreateProgram();
+	ProgramBuilder{ m_programPostprocessID }
+		.ShaderStage(GL_VERTEX_SHADER, "Shaders/Vert_FullScreen.vert")
+		.ShaderStage(GL_FRAGMENT_SHADER, "Shaders/Frag_Postprocess.frag")
+		.Link();
 }
 
 void CMyApp::CleanShaders()
@@ -172,6 +180,61 @@ struct SurfaceOfRevolution
 	}
 };
 
+void CMyApp::InitFrameBufferObject()
+{
+	// FBO létrehozása
+	if (m_frameBufferCreated)
+		return;
+	glCreateFramebuffers(1, &m_frameBuffer);
+	m_frameBufferCreated = true;
+}
+
+void CMyApp::CleanFrameBufferObject()
+{
+	glDeleteFramebuffers(1, &m_frameBuffer);
+}
+
+void CMyApp::InitResolutionDependentResources(int width, int height)
+{
+	// Setup the texture
+	// We use texture because we will sample it later in the shader
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_colorBuffer);
+	glTextureStorage2D(m_colorBuffer, 1, GL_RGBA32F, width, height);
+
+	glNamedFramebufferTexture(m_frameBuffer, GL_COLOR_ATTACHMENT0, m_colorBuffer, 0);
+
+	// Setup renderbuffer
+	// We use renderbuffer because it's more optimized for drawing
+	// and we won't sample it later
+	glCreateRenderbuffers(1, &m_depthBuffer);
+	glNamedRenderbufferStorage(m_depthBuffer, GL_DEPTH_COMPONENT24, width, height);
+
+	glNamedFramebufferRenderbuffer(m_frameBuffer, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
+
+	// Completeness check
+	GLenum status = glCheckNamedFramebufferStatus(m_frameBuffer, GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		switch (status) {
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+			SDL_LogError(SDL_LOG_CATEGORY_ERROR, "[InitFramebuffer] Incomplete framebuffer GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT!");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+			SDL_LogError(SDL_LOG_CATEGORY_ERROR, "[InitFramebuffer] Incomplete framebuffer GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT!");
+			break;
+		case GL_FRAMEBUFFER_UNSUPPORTED:
+			SDL_LogError(SDL_LOG_CATEGORY_ERROR, "[InitFramebuffer] Incomplete framebuffer GL_FRAMEBUFFER_UNSUPPORTED!");
+			break;
+		}
+	}
+}
+
+void CMyApp::CleanResolutionDependentResources()
+{
+	glDeleteRenderbuffers(1, &m_depthBuffer);
+	glDeleteTextures(1, &m_colorBuffer);
+}
+
 void CMyApp::InitGeometry()
 {
 
@@ -277,6 +340,7 @@ bool CMyApp::Init()
 	InitShaders();
 	InitGeometry();
 	InitTextures();
+	InitFrameBufferObject();
 
 	//
 	// egyéb inicializálás
@@ -303,6 +367,8 @@ void CMyApp::Clean()
 	CleanShaders();
 	CleanGeometry();
 	CleanTextures();
+	CleanResolutionDependentResources();
+	CleanFrameBufferObject();
 }
 
 void CMyApp::Update( const SUpdateInfo& updateInfo )
@@ -321,13 +387,37 @@ void CMyApp::Update( const SUpdateInfo& updateInfo )
 
 void CMyApp::Render()
 {
-	// töröljük a frampuffert (GL_COLOR_BUFFER_BIT)...
-	// ... és a mélységi Z puffert (GL_DEPTH_BUFFER_BIT)
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
 
-	glm::mat4 matWorld = glm::identity<glm::mat4>();
+	if (m_needFreshFboByMouse || m_needFreshFboByKey || m_needFreshFboByLight)
+	{
+		// töröljük a frampuffert (GL_COLOR_BUFFER_BIT)...
+		// ... és a mélységi Z puffert (GL_DEPTH_BUFFER_BIT)
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//RenderCylinder(matWorld);
+		for (auto element : pipeSystem.elements)
+		{
+			if (element->isSphere)
+			{
+				RenderSphere(element->posRot, element->color);
+
+				if (!element->isEnd)
+					RenderCylinder(element->posRot, element->color, true);
+
+				if (!element->isBegin)
+					RenderCylinder(element->prevPosRot, element->color, true);
+			}
+			else
+				RenderCylinder(element->posRot, element->color, false);
+		}
+
+		RenderSkyBox();
+		m_needFreshFboByMouse = false;
+		m_needFreshFboByLight = false; 
+		m_needFreshFboByKey = length(m_cameraManipulator.GetSpeed()) != 0;
+	}
+
+
 	for (auto element : pipeSystem.freshElements)
 	{
 		if (element->isSphere)
@@ -344,28 +434,22 @@ void CMyApp::Render()
 			RenderCylinder(element->posRot, element->color, false);
 	}
 
-	for (auto element : pipeSystem.elements)
-	{
-		if (element->isSphere)
-		{
-			RenderSphere(element->posRot, element->color);
-
-			if (!element->isEnd)
-				RenderCylinder(element->posRot, element->color, true);
-
-			if (!element->isBegin)
-				RenderCylinder(element->prevPosRot, element->color, true);
-		}
-		else
-			RenderCylinder(element->posRot, element->color, false);
-	}
-
-	//RenderCircle(matWorld);
-
-	RenderSkyBox();
-
 	// VAO kikapcsolása
 	glBindVertexArray( 0 );
+
+	//Bac to default fbo
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glBindVertexArray(0);
+
+	glBindTextureUnit(0, m_colorBuffer);
+
+	glUseProgram(m_programPostprocessID);
+	glUniform1i(ul("frameTex"), 0);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
 }
 
 void CMyApp::RenderSphere(glm::mat4& matWorld, glm::vec3& color)
@@ -650,6 +734,7 @@ void CMyApp::RenderGUI()
 			m_lightPos.x = lightPosXZ.x;
 			m_lightPos.z = lightPosXZ.y;
 			m_lightPos.y = sqrtf(1.0f - lightPosL2);
+			m_needFreshFboByLight = true;
 		}
 		ImGui::LabelText("Light Position Y", "%f", m_lightPos.y);
 
@@ -696,6 +781,7 @@ void CMyApp::KeyboardDown(const SDL_KeyboardEvent& key)
 		}
 	}
 	m_cameraManipulator.KeyboardDown( key );
+	m_needFreshFboByKey = true;
 }
 
 void CMyApp::KeyboardUp(const SDL_KeyboardEvent& key)
@@ -708,6 +794,7 @@ void CMyApp::KeyboardUp(const SDL_KeyboardEvent& key)
 void CMyApp::MouseMove(const SDL_MouseMotionEvent& mouse)
 {
 	m_cameraManipulator.MouseMove( mouse );
+	m_needFreshFboByMouse = true;
 }
 
 // https://wiki.libsdl.org/SDL2/SDL_MouseButtonEvent
@@ -733,6 +820,12 @@ void CMyApp::Resize(int _w, int _h)
 {
 	glViewport(0, 0, _w, _h);
 	m_camera.SetAspect( static_cast<float>(_w) / _h );
+
+
+	// When we resize we need to remake the framebuffer with the new size,
+	// because now we want the two framebuffer (default,ours) to be the same resolution
+	CleanResolutionDependentResources();
+	InitResolutionDependentResources(_w, _h);
 }
 
 // Le nem kezelt, egzotikus esemény kezelése
