@@ -311,6 +311,12 @@ void CMyApp::Update( const SUpdateInfo& updateInfo )
 
 	m_cameraManipulator.Update( updateInfo.DeltaTimeInSec );
 	//m_lightPos = glm::vec4( m_camera.GetEye(), 1.0 );
+
+	if (m_ElapsedTimeInSec - prevActionTime > generationTime)
+	{
+		pipeSystem.next();
+		prevActionTime = m_ElapsedTimeInSec;
+	}
 }
 
 void CMyApp::Render()
@@ -322,9 +328,36 @@ void CMyApp::Render()
 	glm::mat4 matWorld = glm::identity<glm::mat4>();
 
 	//RenderCylinder(matWorld);
-	for (auto sphere : pipeSystem.freshElements)
+	for (auto element : pipeSystem.freshElements)
 	{
-		RenderSphere(sphere->posRot);
+		if (element->isSphere)
+		{
+			RenderSphere(element->posRot, element->color);
+
+			if(!element->isEnd)
+				RenderCylinder(element->posRot, element->color, true);
+
+			if(!element->isBegin)
+				RenderCylinder(element->prevPosRot, element->color, true);
+		}
+		else
+			RenderCylinder(element->posRot, element->color, false);
+	}
+
+	for (auto element : pipeSystem.elements)
+	{
+		if (element->isSphere)
+		{
+			RenderSphere(element->posRot, element->color);
+
+			if (!element->isEnd)
+				RenderCylinder(element->posRot, element->color, true);
+
+			if (!element->isBegin)
+				RenderCylinder(element->prevPosRot, element->color, true);
+		}
+		else
+			RenderCylinder(element->posRot, element->color, false);
 	}
 
 	//RenderCircle(matWorld);
@@ -335,7 +368,7 @@ void CMyApp::Render()
 	glBindVertexArray( 0 );
 }
 
-void CMyApp::RenderSphere(glm::mat4& matWorld)
+void CMyApp::RenderSphere(glm::mat4& matWorld, glm::vec3& color)
 {
 	// - VAO beállítása
 	glBindVertexArray(m_surfaceGPU.vaoID);
@@ -349,6 +382,7 @@ void CMyApp::RenderSphere(glm::mat4& matWorld)
 	glUseProgram(m_Sphere_programID);
 
 	// - Uniform paraméterek
+	glUniform3fv(ul("color"), 1, glm::value_ptr(color));
 
 	// view és projekciós mátrix
 	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
@@ -398,8 +432,9 @@ void CMyApp::RenderSphere(glm::mat4& matWorld)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void CMyApp::RenderCylinder(glm::mat4& matWorld)
+void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExtend)
 {
+	RenderCircle(matWorld, color);
 	// - VAO beállítása
 	glBindVertexArray(m_surfaceGPU.vaoID);
 
@@ -412,12 +447,17 @@ void CMyApp::RenderCylinder(glm::mat4& matWorld)
 	glUseProgram(m_Cylinder_programID);
 
 	// - Uniform paraméterek
+	glUniform3fv(ul("color"), 1, glm::value_ptr(color));
 
 	// view és projekciós mátrix
 	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
 
 	// Transzformációs mátrixok
-
+	if(sphereExtend)
+		matWorld *= glm::scale(glm::vec3(1.0,0.5,1.0));
+	else
+		matWorld *= glm::translate(glm::vec3(0, -0.5, 0));
+	
 	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
 	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
 
@@ -461,7 +501,7 @@ void CMyApp::RenderCylinder(glm::mat4& matWorld)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void CMyApp::RenderCircle(glm::mat4& matWorld)
+void CMyApp::RenderCircle(glm::mat4& matWorld, glm::vec3& color)
 {
 	// - VAO beállítása
 	glBindVertexArray(m_surfaceGPU.vaoID);
@@ -475,6 +515,7 @@ void CMyApp::RenderCircle(glm::mat4& matWorld)
 	glUseProgram(m_Circle_programID);
 
 	// - Uniform paraméterek
+	glUniform3fv(ul("color"), 1, glm::value_ptr(color));
 
 	// view és projekciós mátrix
 	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
@@ -593,7 +634,26 @@ void CMyApp::RenderGUI()
 
 		ImGui::SliderFloat( "Constant Attenuation", &m_lightConstantAttenuation, 0.001f, 2.0f );
 		ImGui::SliderFloat( "Linear Attenuation", &m_lightLinearAttenuation, 0.001f, 2.0f );
-		ImGui::SliderFloat( "Quadratic Attenuation", &m_lightQuadraticAttenuation, 0.001f, 2.0f );	
+		ImGui::SliderFloat( "Quadratic Attenuation", &m_lightQuadraticAttenuation, 0.001f, 2.0f );
+
+		static glm::vec2 lightPosXZ = glm::vec2(0.0f);
+		lightPosXZ = glm::vec2(m_lightPos.x, m_lightPos.z);
+		if (ImGui::SliderFloat2("Light Position XZ", glm::value_ptr(lightPosXZ), -1.0f, 1.0f))
+		{
+			float lightPosL2 = lightPosXZ.x * lightPosXZ.x + lightPosXZ.y * lightPosXZ.y;
+			if (lightPosL2 > 1.0f) // Ha kívülre esne a körön, akkor normalizáljuk
+			{
+				lightPosXZ /= sqrtf(lightPosL2);
+				lightPosL2 = 1.0f;
+			}
+
+			m_lightPos.x = lightPosXZ.x;
+			m_lightPos.z = lightPosXZ.y;
+			m_lightPos.y = sqrtf(1.0f - lightPosL2);
+		}
+		ImGui::LabelText("Light Position Y", "%f", m_lightPos.y);
+
+		ImGui::SliderFloat("Generation Time", &generationTime, 0.1f, 5.0f);
 	}
 
 	ImGui::End();

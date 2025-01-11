@@ -5,12 +5,13 @@
 class Builder
 {
 public:
-	Builder(std::vector<bool>& availability, int gridSize, std::vector<Element*>& freshElements);
+	Builder(std::vector<bool>& availability, int gridSize, std::vector<Element*>& freshElements, glm::vec3 col, bool& canContinue, bool& noMoreSpace);
 
 	~Builder();
 
 	int toIndex(int x, int y, int z);
 	bool isIn(int a);
+	bool next();
 
 private:
 	//current position
@@ -27,4 +28,6 @@ private:
 
 	std::vector<bool>& availability;
 	std::vector<Element*>& freshElements;
+
+	glm::vec3 color;
 };

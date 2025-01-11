@@ -44,7 +44,7 @@ private:
 	glm::vec3 m_point = glm::vec3( 0.0f );
 
 	// The traversal speed of the camera
-	float m_acceleration = 0.1f;
+	float m_acceleration = 4.0f;
 	glm::vec3 m_speed = glm::vec3(0.0);
 
 	// Traveling indicator to different directions.

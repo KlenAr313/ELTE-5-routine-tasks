@@ -18,7 +18,7 @@ uniform mat4 viewProj;
 uniform sampler2D texImage;
 uniform sampler2D colorTexImage;
 
-float r = 1.0;
+float r = 0.5;
 
 //SPHERE
 void main()

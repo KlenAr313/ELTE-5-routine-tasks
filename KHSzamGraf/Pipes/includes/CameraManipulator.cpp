@@ -58,13 +58,14 @@ void CameraManipulator::Update( float _deltaTime)
 	lookDirection = glm::normalize(lookDirection);
 	up = glm::normalize(glm::cross(lookDirection, right));
 
-	m_speed += (m_goForward * lookDirection + m_goRight * right + m_goUp * up) * m_acceleration * _deltaTime;
+	//m_speed += (m_goForward * lookDirection + m_goRight * right + m_goUp * up) * m_acceleration * _deltaTime;
+	m_speed = (m_goForward * lookDirection + m_goRight * right + m_goUp * up) * m_acceleration * _deltaTime;
 
 	//float skalarSpeed = m_speed.x + m_speed.y + m_speed.z;
 
-	m_speed -= m_speed * 0.05f * _deltaTime;
+	//m_speed -= m_speed * 0.05f * _deltaTime;
 
-	m_speed -= m_speed * 0.35f * _deltaTime * m_break;
+	//m_speed -= m_speed * 0.35f * _deltaTime * m_break;
 
 
 	// Az új elmozdulásat a kamera mozgás irányának és sebességének a segítségével számoljuk ki.

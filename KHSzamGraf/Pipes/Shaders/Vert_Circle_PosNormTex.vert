@@ -18,7 +18,7 @@ uniform mat4 viewProj;
 uniform sampler2D texImage;
 uniform sampler2D colorTexImage;
 
-float r = 0.9;
+float r = 0.3;
 
 // CIRCLE
 void main()

@@ -14,6 +14,8 @@ uniform sampler2D colorTexImage;
 
 uniform vec3 cameraPos;
 
+uniform vec3 color;
+
 // fenyforras tulajdonsagok
 uniform vec4 lightPos = vec4( 0.0, 1.0, 0.0, 0.0);
 
@@ -93,5 +95,5 @@ void main()
 
 	// normal vector debug:
 	// fs_out_col = vec4( normal * 0.5 + 0.5, 1.0 );
-	fs_out_col = vec4( Ambient+Diffuse+Specular, 1.0 ) * texture(colorTexImage, vs_out_tex);
+	fs_out_col = /*vec4( Ambient+Diffuse+Specular, 1.0 ) **/ texture(colorTexImage, vs_out_tex) * vec4(color, 0);
 }

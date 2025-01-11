@@ -38,9 +38,9 @@ public:
 	void Render();
 	void RenderGUI();
 
-	void RenderSphere(glm::mat4& matWorld);
-	void RenderCylinder(glm::mat4& matWorld);
-	void RenderCircle(glm::mat4& matWorld);
+	void RenderSphere(glm::mat4& matWorld, glm::vec3& color);
+	void RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExtend);
+	void RenderCircle(glm::mat4& matWorld, glm::vec3& color);
 
 	void RenderSkyBox();
 
@@ -120,6 +120,8 @@ protected:
 	void CleanTextures();
 
 	//Pipe System
-	System pipeSystem = System(5, 4);
+	System pipeSystem = System(5, 2);
+	float prevActionTime = 0;
+	float generationTime = 1.0;
 };
 
