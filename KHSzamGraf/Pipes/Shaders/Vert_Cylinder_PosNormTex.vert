@@ -15,7 +15,7 @@ uniform mat4 world;
 uniform mat4 worldIT;
 uniform mat4 viewProj;
 
-uniform sampler2D texImage;
+//uniform sampler2D texImage;
 uniform sampler2D colorTexImage;
 
 float r = 0.3;

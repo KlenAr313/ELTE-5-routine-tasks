@@ -309,12 +309,6 @@ void CMyApp::CleanGeometry()
 
 void CMyApp::InitTextures()
 {
-	// diffuse texture
-	glGenTextures( 1, &m_TextureID );
-	//TextureFromFile( m_TextureID, "Assets/Approximate_Earth_Heigh_Map.png" );
-	TextureFromFile( m_TextureID, "Assets/earth-height-map.png" );
-	//TextureFromFile( m_TextureID, "Assets/color_checkerboard.png" );
-	SetupTextureSampling( GL_TEXTURE_2D, m_TextureID );
 
 	glGenTextures(1, &m_ColorTextureID);
 	TextureFromFile(m_ColorTextureID, "Assets/colorTex.jpg" );
@@ -413,6 +407,14 @@ void CMyApp::Render()
 		// ... és a mélységi Z puffert (GL_DEPTH_BUFFER_BIT)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+		// - VAO beállítása
+		glBindVertexArray(m_surfaceGPU.vaoID);
+
+		// - Textúrák beállítása, minden egységre külön
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, m_ColorTextureID);
+
 		for (auto element : pipeSystem->elements)
 		{
 			if (element->isSphere)
@@ -438,12 +440,27 @@ void CMyApp::Render()
 			}
 		}
 
+
+		// - VAO kikapcs
+		glBindVertexArray(0);
+
+		// - Textúrák kikapcsolása, minden egységre külön
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
 		RenderSkyBox();
 		m_needFreshFboByMouse = false;
 		m_needFreshFboByLight = false; 
 		m_needFreshFboByKey = length(m_cameraManipulator.GetSpeed()) != 0;
 	}
 
+
+	// - VAO beállítása
+	glBindVertexArray(m_surfaceGPU.vaoID);
+
+	// - Textúrák beállítása, minden egységre külön
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_ColorTextureID);
 
 	for (auto element : pipeSystem->freshElements)
 	{
@@ -470,6 +487,10 @@ void CMyApp::Render()
 		}
 	}
 
+	// - Textúrák kikapcsolása, minden egységre külön
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	//Back to default fbo
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -491,15 +512,6 @@ void CMyApp::Render()
 
 void CMyApp::RenderSphere(glm::mat4& matWorld, glm::vec3& color)
 {
-	// - VAO beállítása
-	glBindVertexArray(m_surfaceGPU.vaoID);
-
-	// - Textúrák beállítása, minden egységre külön
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_TextureID);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, m_ColorTextureID);
-
 	glUseProgram(m_Sphere_programID);
 
 	// - Uniform paraméterek
@@ -520,25 +532,10 @@ void CMyApp::RenderSphere(glm::mat4& matWorld, glm::vec3& color)
 
 	// shader kikapcsolasa
 	glUseProgram(0);
-
-	// - Textúrák kikapcsolása, minden egységre külön
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExtend)
 {
-	// - VAO beállítása
-	glBindVertexArray(m_surfaceGPU.vaoID);
-
-	// - Textúrák beállítása, minden egységre külön
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_TextureID);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, m_ColorTextureID);
-
 	glUseProgram(m_Cylinder_programID);
 
 	// - Uniform paraméterek
@@ -563,22 +560,10 @@ void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExt
 
 	// shader kikapcsolasa
 	glUseProgram(0);
-
-	// - Textúrák kikapcsolása, minden egységre külön
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void CMyApp::RenderCircle(glm::mat4& matWorld, glm::vec3& color)
 {
-	// - Textúrák beállítása, minden egységre külön
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_TextureID);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, m_ColorTextureID);
-
 	glUseProgram(m_Circle_programID);
 
 	// - Uniform paraméterek
@@ -599,12 +584,6 @@ void CMyApp::RenderCircle(glm::mat4& matWorld, glm::vec3& color)
 
 	// shader kikapcsolasa
 	glUseProgram(0);
-
-	// - Textúrák kikapcsolása, minden egységre külön
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void CMyApp::RenderSkyBox()
