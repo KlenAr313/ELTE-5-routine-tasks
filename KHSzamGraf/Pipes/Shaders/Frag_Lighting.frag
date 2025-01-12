@@ -95,5 +95,5 @@ void main()
 
 	// normal vector debug:
 	// fs_out_col = vec4( normal * 0.5 + 0.5, 1.0 );
-	fs_out_col = vec4( Ambient+Diffuse+Specular, 1.0 ) * texture(colorTexImage, vs_out_tex) * vec4(color, 0);
+	fs_out_col = vec4( Ambient+Diffuse+Specular, 1.0 ) * vec4(color, 0);// * texture(colorTexImage, vs_out_tex);
 }

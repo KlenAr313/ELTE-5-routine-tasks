@@ -7,8 +7,6 @@
 Builder::Builder(std::vector<bool>& availability, int gridSize, std::vector<Element*>& freshElements, glm::vec3 col, bool& canContinue, bool& noMoreSpace)
 	:availability(availability), gridSize(gridSize), freshElements(freshElements)
 {
-
-	std::srand(std::time(nullptr));
 	this->color = glm::vec3(col);
 	std::vector<int> possAvail;
 	for (int i = 0; i < availability.size(); ++i)
@@ -72,7 +70,6 @@ Builder::Builder(std::vector<bool>& availability, int gridSize, std::vector<Elem
 	else
 	{
 		noMoreSpace = true;
-		//TODO stop generating
 	}
 }
 

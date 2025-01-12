@@ -385,12 +385,13 @@ void CMyApp::Update( const SUpdateInfo& updateInfo )
 	{
 		pipeSystem->next();
 		prevActionTime = m_ElapsedTimeInSec;
+		m_freshPipes = true;
 	}
 
 	if (m_needNewSystem)
 	{
 		delete(pipeSystem);
-		pipeSystem = new System(m_gridSize, 2);
+		pipeSystem = new System(m_gridSize, 10);
 		m_needNewSystem = false;
 		m_needFreshFboByLight = true;
 	}
@@ -452,44 +453,50 @@ void CMyApp::Render()
 		m_needFreshFboByMouse = false;
 		m_needFreshFboByLight = false; 
 		m_needFreshFboByKey = length(m_cameraManipulator.GetSpeed()) != 0;
+
+		m_freshPipes = true;
 	}
 
-
-	// - VAO beállítása
-	glBindVertexArray(m_surfaceGPU.vaoID);
-
-	// - Textúrák beállítása, minden egységre külön
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, m_ColorTextureID);
-
-	for (auto element : pipeSystem->freshElements)
+	if (m_freshPipes)
 	{
-		if (element->isSphere)
+		// - VAO beállítása
+		glBindVertexArray(m_surfaceGPU.vaoID);
+
+		// - Textúrák beállítása, minden egységre külön
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, m_ColorTextureID);
+
+		for (auto element : pipeSystem->freshElements)
 		{
-			RenderSphere(element->posRot, element->color);
-
-			if(!element->isEnd)
+			if (element->isSphere)
 			{
-				RenderCylinder(element->posRot, element->color, true);
-				RenderCircle(element->posRot, element->color);
+				RenderSphere(element->posRot, element->color);
+
+				if (!element->isEnd)
+				{
+					RenderCylinder(element->posRot, element->color, true);
+					RenderCircle(element->posRot, element->color);
+				}
+
+				if (!element->isBegin)
+				{
+					RenderCylinder(element->prevPosRot, element->color, true);
+					RenderCircle(element->posRot, element->color);
+				}
 			}
-
-			if(!element->isBegin)
+			else
 			{
-				RenderCylinder(element->prevPosRot, element->color, true);
+				RenderCylinder(element->posRot, element->color, false);
 				RenderCircle(element->posRot, element->color);
 			}
 		}
-		else
-		{
-			RenderCylinder(element->posRot, element->color, false);
-			RenderCircle(element->posRot, element->color);
-		}
+
+		// - Textúrák kikapcsolása, minden egységre külön
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		m_freshPipes = false;
 	}
-
-	// - Textúrák kikapcsolása, minden egységre külön
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, 0);
 
 	//Back to default fbo
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

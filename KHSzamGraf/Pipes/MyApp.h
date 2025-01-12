@@ -122,17 +122,17 @@ protected:
 	void CleanTextures();
 
 	//Pipe System
-	System* pipeSystem = new System(5, 2);
+	System* pipeSystem = new System(10, 5);
 	float prevActionTime = 0;
 	float generationTime = 1.0;
-	int m_gridSize = 5;
+	int m_gridSize = 10;
 	bool m_needNewSystem{ false };
 
 	//FBO
 	bool m_frameBufferCreated{ false }; 	//Korábban hoztunk már létre FBO-t?
-	GLuint m_depthBuffer;               	//FBO Mélységbuffer textúra azonosító
-	GLuint m_colorBuffer;               	//FBO Színbuffer textúra azonosító
-	GLuint m_frameBuffer;               	//FBO azonosító
+	GLuint m_depthBuffer = 0;               	//FBO Mélységbuffer textúra azonosító
+	GLuint m_colorBuffer = 0;               	//FBO Színbuffer textúra azonosító
+	GLuint m_frameBuffer = 0;               	//FBO azonosító
 
 	// Framebuffer initialization and termination
 	void InitFrameBufferObject();
@@ -141,8 +141,8 @@ protected:
 	void CleanResolutionDependentResources();
 
 	bool m_needFreshFboByKey{true};
-	bool m_start{ true };
 	bool m_needFreshFboByMouse{true};
 	bool m_needFreshFboByLight{true};
+	bool m_freshPipes{ true };
 };
 

@@ -27,7 +27,6 @@ System::System(int size, int pipeCount): elements(0), pipeCount(pipeCount), grid
 		}
 		else delete(builder);
 	}
-	//TODO new for every deleted
 }
 
 void System::next()
@@ -71,8 +70,6 @@ void System::next()
 	}
 
 	closedBuilderCount = cloasedBuilderCountInRound;
-
-	//TODO new for every deleted
 }
 
 System::~System()
