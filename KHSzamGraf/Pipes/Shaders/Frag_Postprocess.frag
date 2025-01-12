@@ -19,12 +19,13 @@ void main()
 
     float depth = texture(depthTex, vs_out_tex).r;
     int k = 1;
-    if(depth < 4)
+    if(depth < 4.0)
     {
         k = int( floor( 4.0 - ((depth / 2.0) * (depth / 2.0))));
     }
-    else
+    else if (depth >= 6.0)
     {
+        depth = depth - 2.0;
         k = int(8.0 * atan((depth-4.0)/5.0) / PI);
     }
         

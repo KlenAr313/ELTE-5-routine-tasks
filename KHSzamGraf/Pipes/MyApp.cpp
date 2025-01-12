@@ -406,6 +406,7 @@ void CMyApp::Render()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
 
+
 	if (m_needFreshFboByMouse || m_needFreshFboByKey || m_needFreshFboByLight)
 	{
 		// töröljük a frampuffert (GL_COLOR_BUFFER_BIT)...
@@ -419,13 +420,22 @@ void CMyApp::Render()
 				RenderSphere(element->posRot, element->color);
 
 				if (!element->isEnd)
+				{
 					RenderCylinder(element->posRot, element->color, true);
+					RenderCircle(element->posRot, element->color);
+				}
 
 				if (!element->isBegin)
+				{
 					RenderCylinder(element->prevPosRot, element->color, true);
+					RenderCircle(element->posRot, element->color);
+				}
 			}
 			else
+			{
 				RenderCylinder(element->posRot, element->color, false);
+				RenderCircle(element->posRot, element->color);
+			}
 		}
 
 		RenderSkyBox();
@@ -442,19 +452,25 @@ void CMyApp::Render()
 			RenderSphere(element->posRot, element->color);
 
 			if(!element->isEnd)
+			{
 				RenderCylinder(element->posRot, element->color, true);
+				RenderCircle(element->posRot, element->color);
+			}
 
 			if(!element->isBegin)
+			{
 				RenderCylinder(element->prevPosRot, element->color, true);
+				RenderCircle(element->posRot, element->color);
+			}
 		}
 		else
+		{
 			RenderCylinder(element->posRot, element->color, false);
+			RenderCircle(element->posRot, element->color);
+		}
 	}
 
-	// VAO kikapcsolása
-	glBindVertexArray( 0 );
-
-	//Bac to default fbo
+	//Back to default fbo
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -489,37 +505,12 @@ void CMyApp::RenderSphere(glm::mat4& matWorld, glm::vec3& color)
 	// - Uniform paraméterek
 	glUniform3fv(ul("color"), 1, glm::value_ptr(color));
 
-	// view és projekciós mátrix
-	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
 
 	// Transzformációs mátrixok
-
 	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
 	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
 
-	// - Fényforrások beállítása
-	glUniform3fv(ul("cameraPos"), 1, glm::value_ptr(m_camera.GetEye()));
-	glUniform4fv(ul("lightPos"), 1, glm::value_ptr(m_lightPos));
-
-	glUniform3fv(ul("La"), 1, glm::value_ptr(m_La));
-	glUniform3fv(ul("Ld"), 1, glm::value_ptr(m_Ld));
-	glUniform3fv(ul("Ls"), 1, glm::value_ptr(m_Ls));
-
-	glUniform1f(ul("lightConstantAttenuation"), m_lightConstantAttenuation);
-	glUniform1f(ul("lightLinearAttenuation"), m_lightLinearAttenuation);
-	glUniform1f(ul("lightQuadraticAttenuation"), m_lightQuadraticAttenuation);
-
-	// - Anyagjellemzők beállítása
-	glUniform3fv(ul("Ka"), 1, glm::value_ptr(m_Ka));
-	glUniform3fv(ul("Kd"), 1, glm::value_ptr(m_Kd));
-	glUniform3fv(ul("Ks"), 1, glm::value_ptr(m_Ks));
-
-	glUniform1f(ul("Shininess"), m_Shininess);
-
-
-	// - textúraegységek beállítása
-	glUniform1i(ul("texImage"), 0);
-	glUniform1i(ul("colorTexImage"), 1);
+	SetupLightsAndOther();
 
 	// Rajzolási parancs kiadása
 	glDrawElements(GL_TRIANGLES,
@@ -539,7 +530,6 @@ void CMyApp::RenderSphere(glm::mat4& matWorld, glm::vec3& color)
 
 void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExtend)
 {
-	RenderCircle(matWorld, color);
 	// - VAO beállítása
 	glBindVertexArray(m_surfaceGPU.vaoID);
 
@@ -554,9 +544,6 @@ void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExt
 	// - Uniform paraméterek
 	glUniform3fv(ul("color"), 1, glm::value_ptr(color));
 
-	// view és projekciós mátrix
-	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
-
 	// Transzformációs mátrixok
 	if(sphereExtend)
 		matWorld *= glm::scale(glm::vec3(1.0,0.5,1.0));
@@ -566,29 +553,7 @@ void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExt
 	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
 	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
 
-	// - Fényforrások beállítása
-	glUniform3fv(ul("cameraPos"), 1, glm::value_ptr(m_camera.GetEye()));
-	glUniform4fv(ul("lightPos"), 1, glm::value_ptr(m_lightPos));
-
-	glUniform3fv(ul("La"), 1, glm::value_ptr(m_La));
-	glUniform3fv(ul("Ld"), 1, glm::value_ptr(m_Ld));
-	glUniform3fv(ul("Ls"), 1, glm::value_ptr(m_Ls));
-
-	glUniform1f(ul("lightConstantAttenuation"), m_lightConstantAttenuation);
-	glUniform1f(ul("lightLinearAttenuation"), m_lightLinearAttenuation);
-	glUniform1f(ul("lightQuadraticAttenuation"), m_lightQuadraticAttenuation);
-
-	// - Anyagjellemzők beállítása
-	glUniform3fv(ul("Ka"), 1, glm::value_ptr(m_Ka));
-	glUniform3fv(ul("Kd"), 1, glm::value_ptr(m_Kd));
-	glUniform3fv(ul("Ks"), 1, glm::value_ptr(m_Ks));
-
-	glUniform1f(ul("Shininess"), m_Shininess);
-
-
-	// - textúraegységek beállítása
-	glUniform1i(ul("texImage"), 0);
-	glUniform1i(ul("colorTexImage"), 1);
+	SetupLightsAndOther();
 
 	// Rajzolási parancs kiadása
 	glDrawElements(GL_TRIANGLES,
@@ -608,9 +573,6 @@ void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExt
 
 void CMyApp::RenderCircle(glm::mat4& matWorld, glm::vec3& color)
 {
-	// - VAO beállítása
-	glBindVertexArray(m_surfaceGPU.vaoID);
-
 	// - Textúrák beállítása, minden egységre külön
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_TextureID);
@@ -622,37 +584,12 @@ void CMyApp::RenderCircle(glm::mat4& matWorld, glm::vec3& color)
 	// - Uniform paraméterek
 	glUniform3fv(ul("color"), 1, glm::value_ptr(color));
 
-	// view és projekciós mátrix
-	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
-
 	// Transzformációs mátrixok
 
 	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
 	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
 
-	// - Fényforrások beállítása
-	glUniform3fv(ul("cameraPos"), 1, glm::value_ptr(m_camera.GetEye()));
-	glUniform4fv(ul("lightPos"), 1, glm::value_ptr(m_lightPos));
-
-	glUniform3fv(ul("La"), 1, glm::value_ptr(m_La));
-	glUniform3fv(ul("Ld"), 1, glm::value_ptr(m_Ld));
-	glUniform3fv(ul("Ls"), 1, glm::value_ptr(m_Ls));
-
-	glUniform1f(ul("lightConstantAttenuation"), m_lightConstantAttenuation);
-	glUniform1f(ul("lightLinearAttenuation"), m_lightLinearAttenuation);
-	glUniform1f(ul("lightQuadraticAttenuation"), m_lightQuadraticAttenuation);
-
-	// - Anyagjellemzők beállítása
-	glUniform3fv(ul("Ka"), 1, glm::value_ptr(m_Ka));
-	glUniform3fv(ul("Kd"), 1, glm::value_ptr(m_Kd));
-	glUniform3fv(ul("Ks"), 1, glm::value_ptr(m_Ks));
-
-	glUniform1f(ul("Shininess"), m_Shininess);
-
-
-	// - textúraegységek beállítása
-	glUniform1i(ul("texImage"), 0);
-	glUniform1i(ul("colorTexImage"), 1);
+	SetupLightsAndOther();
 
 	// Rajzolási parancs kiadása
 	glDrawElements(GL_TRIANGLES,
@@ -710,6 +647,34 @@ void CMyApp::RenderSkyBox()
 	// - Textúrák kikapcsolása, minden egységre külön
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void CMyApp::SetupLightsAndOther()
+{
+	// view és projekciós mátrix
+	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
+	// - Fényforrások beállítása
+	glUniform3fv(ul("cameraPos"), 1, glm::value_ptr(m_camera.GetEye()));
+	glUniform4fv(ul("lightPos"), 1, glm::value_ptr(m_lightPos));
+
+	glUniform3fv(ul("La"), 1, glm::value_ptr(m_La));
+	glUniform3fv(ul("Ld"), 1, glm::value_ptr(m_Ld));
+	glUniform3fv(ul("Ls"), 1, glm::value_ptr(m_Ls));
+
+	glUniform1f(ul("lightConstantAttenuation"), m_lightConstantAttenuation);
+	glUniform1f(ul("lightLinearAttenuation"), m_lightLinearAttenuation);
+	glUniform1f(ul("lightQuadraticAttenuation"), m_lightQuadraticAttenuation);
+
+	// - Anyagjellemzők beállítása
+	glUniform3fv(ul("Ka"), 1, glm::value_ptr(m_Ka));
+	glUniform3fv(ul("Kd"), 1, glm::value_ptr(m_Kd));
+	glUniform3fv(ul("Ks"), 1, glm::value_ptr(m_Ks));
+
+	glUniform1f(ul("Shininess"), m_Shininess);
+
+	// - textúraegységek beállítása
+	glUniform1i(ul("texImage"), 0);
+	glUniform1i(ul("colorTexImage"), 1);
 }
 
 void CMyApp::RenderGUI()

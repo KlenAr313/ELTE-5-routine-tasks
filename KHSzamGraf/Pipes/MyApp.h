@@ -41,6 +41,7 @@ public:
 	void RenderSphere(glm::mat4& matWorld, glm::vec3& color);
 	void RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExtend);
 	void RenderCircle(glm::mat4& matWorld, glm::vec3& color);
+	void SetupLightsAndOther();
 
 	void RenderSkyBox();
 
