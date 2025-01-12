@@ -206,10 +206,19 @@ void CMyApp::InitResolutionDependentResources(int width, int height)
 	// Setup renderbuffer
 	// We use renderbuffer because it's more optimized for drawing
 	// and we won't sample it later
-	glCreateRenderbuffers(1, &m_depthBuffer);
-	glNamedRenderbufferStorage(m_depthBuffer, GL_DEPTH_COMPONENT24, width, height);
+	//glCreateRenderbuffers(1, &m_depthBuffer);
+	//glNamedRenderbufferStorage(m_depthBuffer, GL_DEPTH_COMPONENT32F, width, height);
 
-	glNamedFramebufferRenderbuffer(m_frameBuffer, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_depthBuffer);
+	glTextureStorage2D(m_depthBuffer, 1, GL_DEPTH_COMPONENT32F, width, height);
+
+	glTextureParameteri(m_depthBuffer, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTextureParameteri(m_depthBuffer, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTextureParameteri(m_depthBuffer, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(m_depthBuffer, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glNamedFramebufferTexture(m_frameBuffer, GL_DEPTH_ATTACHMENT, m_depthBuffer, 0);
+	//glNamedFramebufferRenderbuffer(m_frameBuffer, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
 
 	// Completeness check
 	GLenum status = glCheckNamedFramebufferStatus(m_frameBuffer, GL_FRAMEBUFFER);
@@ -451,10 +460,14 @@ void CMyApp::Render()
 
 	glBindVertexArray(0);
 
-	glBindTextureUnit(0, m_colorBuffer);
+	glActiveTexture(GL_TEXTURE0); // Activate texture unit 0
+	glBindTexture(GL_TEXTURE_2D, m_colorBuffer); 
+	glActiveTexture(GL_TEXTURE1); // Activate texture unit 1
+	glBindTexture(GL_TEXTURE_2D, m_depthBuffer);
 
 	glUseProgram(m_programPostprocessID);
 	glUniform1i(ul("frameTex"), 0);
+	glUniform1i(ul("depthTex"), 1);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -835,6 +848,8 @@ void CMyApp::Resize(int _w, int _h)
 {
 	glViewport(0, 0, _w, _h);
 	m_camera.SetAspect( static_cast<float>(_w) / _h );
+	glUseProgram(m_programPostprocessID);
+	glUniform2f(ul("res"), static_cast<float>(_w), static_cast<float>(_h));
 
 
 	// When we resize we need to remake the framebuffer with the new size,
