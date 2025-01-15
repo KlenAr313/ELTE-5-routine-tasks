@@ -12,7 +12,7 @@ public:
 	~System();
 
 	void next();
-	glm::vec3 colorRandomiser();
+	void reColorAt(int at, glm::vec3 color);
 
 	std::vector<Element*> elements;
 	std::vector<Element*> freshElements;
@@ -23,6 +23,7 @@ public:
 	int gridSize;
 
 protected:
+	glm::vec3 colorRandomiser();
 	int pipeCount;
 
 	std::vector<bool> availability;

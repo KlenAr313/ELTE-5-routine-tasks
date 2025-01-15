@@ -127,6 +127,7 @@ protected:
 	float generationTime = 1.0;
 	int m_gridSize = 10;
 	bool m_needNewSystem{ false };
+	int m_reColorAt = -1;
 
 	//FBO
 	bool m_frameBufferCreated{ false }; 	//Korábban hoztunk már létre FBO-t?
@@ -140,11 +141,13 @@ protected:
 	void InitResolutionDependentResources(int, int);
 	void CleanResolutionDependentResources();
 
-	// Checks for fresh fbo
+	// Checks for fresh fbo & system things
 	bool m_needFreshFboByKey{true};
 	bool m_needFreshFboByMouse{true};
 	bool m_needFreshFboByLight{true};
+	bool m_colorChangeForFbo{ false };
 	bool m_freshPipes{ true };
+	bool m_colorChange{ false };
 
 	//imGui
 	int m_guiCurrentItem = -1;

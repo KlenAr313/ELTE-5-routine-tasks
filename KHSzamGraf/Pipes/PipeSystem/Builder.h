@@ -12,7 +12,10 @@ public:
 	int toIndex(int x, int y, int z);
 	bool isIn(int a);
 	bool next();
+	static void resetIds();
+
 	const int ID;
+	glm::vec3 color;
 
 private:
 	static int allID;
@@ -31,5 +34,4 @@ private:
 	std::vector<bool>& availability;
 	std::vector<Element*>& freshElements;
 
-	glm::vec3 color;
 };

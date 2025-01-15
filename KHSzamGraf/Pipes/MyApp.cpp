@@ -383,6 +383,11 @@ void CMyApp::Update( const SUpdateInfo& updateInfo )
 
 	if (m_ElapsedTimeInSec - prevActionTime > generationTime)
 	{
+		if (m_colorChange)
+		{
+			pipeSystem->reColorAt(m_reColorAt, m_newColor);
+			m_colorChange = false;
+		}
 		pipeSystem->next();
 		prevActionTime = m_ElapsedTimeInSec;
 		m_freshPipes = true;
@@ -402,7 +407,7 @@ void CMyApp::Render()
 	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
 
 
-	if (m_needFreshFboByMouse || m_needFreshFboByKey || m_needFreshFboByLight)
+	if (m_needFreshFboByMouse || m_needFreshFboByKey || m_needFreshFboByLight || m_colorChangeForFbo)
 	{
 		// töröljük a frampuffert (GL_COLOR_BUFFER_BIT)...
 		// ... és a mélységi Z puffert (GL_DEPTH_BUFFER_BIT)
@@ -418,6 +423,11 @@ void CMyApp::Render()
 
 		for (auto element : pipeSystem->elements)
 		{
+			if (element->ID == m_reColorAt && m_colorChangeForFbo)
+			{
+				element->color = m_newColor;
+			}
+
 			if (element->isSphere)
 			{
 				RenderSphere(element->posRot, element->color, element->ID);
@@ -468,6 +478,11 @@ void CMyApp::Render()
 
 		for (auto element : pipeSystem->freshElements)
 		{
+			if (element->ID == m_reColorAt && m_colorChangeForFbo)
+			{
+				element->color = m_newColor;
+			}
+
 			if (element->isSphere)
 			{
 				RenderSphere(element->posRot, element->color, element->ID);
@@ -491,6 +506,7 @@ void CMyApp::Render()
 			}
 		}
 
+		m_colorChangeForFbo = false;
 		// - Textúrák kikapcsolása, minden egységre külön
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -757,11 +773,17 @@ void CMyApp::RenderGUI()
 			ImGui::EndListBox();
 		}
 
-		ImGui::SliderFloat3("New Color for Pipe", glm::value_ptr(m_newColor), 0.0f, 1.0f);
-		if (ImGui::Button("Recolor!"))
+		if (!m_colorChange)
 		{
-			m_needFreshFboByLight = true;
-			m_guiCurrentItem = -1;
+			ImGui::SliderFloat3("New Color for Pipe", glm::value_ptr(m_newColor), 0.0f, 1.0f);
+			if (ImGui::Button("Recolor!"))
+			{
+				m_needFreshFboByLight = true;
+				m_colorChange = true;
+				m_colorChangeForFbo = true;
+				m_reColorAt = m_guiCurrentItem;
+				m_guiCurrentItem = -1;
+			}
 		}
 	}
 

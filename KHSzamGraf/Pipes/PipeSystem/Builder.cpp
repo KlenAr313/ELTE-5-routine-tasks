@@ -162,3 +162,8 @@ bool Builder::isIn(int a)
 }
 
 int Builder::allID = 0;
+
+void Builder::resetIds()
+{
+	allID = 0;
+}

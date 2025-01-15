@@ -2,6 +2,7 @@
 
 System::System(int size, int pipeCount): elements(0), pipeCount(pipeCount), gridSize(size)
 {
+	Builder::resetIds();
 	std::srand(std::time(nullptr));
 	availability.reserve(size * size * size);
 	for (int i = 0; i < size*size*size; ++i)
@@ -71,6 +72,18 @@ void System::next()
 	}
 
 	closedBuilderCount = cloasedBuilderCountInRound;
+}
+
+void System::reColorAt(int at, glm::vec3 freshColor)
+{
+	for (int i = 0; i < builders.size(); ++i)
+	{
+		if (builders[i]->ID == at)
+		{
+			builders[i]->color = freshColor;
+			break;
+		}
+	}
 }
 
 System::~System()
