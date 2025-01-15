@@ -441,7 +441,7 @@ void CMyApp::Render()
 				if (!element->isBegin)
 				{
 					RenderCylinder(element->prevPosRot, element->color, element->ID, true);
-					RenderCircle(element->posRot, element->color, element->ID);
+					RenderCircle(element->prevPosRot, element->color, element->ID);
 				}
 			}
 			else
@@ -496,7 +496,7 @@ void CMyApp::Render()
 				if (!element->isBegin)
 				{
 					RenderCylinder(element->prevPosRot, element->color, element->ID, true);
-					RenderCircle(element->posRot, element->color, element->ID);
+					RenderCircle(element->prevPosRot, element->color, element->ID);
 				}
 			}
 			else
