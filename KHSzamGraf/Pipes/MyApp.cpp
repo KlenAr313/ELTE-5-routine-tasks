@@ -840,7 +840,8 @@ void CMyApp::KeyboardUp(const SDL_KeyboardEvent& key)
 void CMyApp::MouseMove(const SDL_MouseMotionEvent& mouse)
 {
 	m_cameraManipulator.MouseMove( mouse );
-	m_needFreshFboByMouse = true;
+	if(mouse.state)
+		m_needFreshFboByMouse = true;
 }
 
 // https://wiki.libsdl.org/SDL2/SDL_MouseButtonEvent
