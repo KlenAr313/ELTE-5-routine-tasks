@@ -254,7 +254,7 @@ void CMyApp::InitGeometry()
 		{ 1, offsetof( Vertex, texcoord ), 2, GL_FLOAT },
 	};
 
-	MeshObject<Vertex> surfaceMeshCPU = GetParamSurfMesh(Param() );
+	MeshObject<Vertex> surfaceMeshCPU = GetParamSurfMeshForStrip(Param() );
 	m_surfaceGPU = CreateGLObjectFromMesh( surfaceMeshCPU, vertexAttribList );
 
 
@@ -553,7 +553,7 @@ void CMyApp::RenderSphere(glm::mat4& matWorld, glm::vec3& color, int ID)
 		glUniform1i(ul("isSelected"), 0);
 
 	// Rajzolási parancs kiadása
-	glDrawElements(GL_TRIANGLES,
+	glDrawElements(GL_TRIANGLE_STRIP,
 		m_surfaceGPU.count,
 		GL_UNSIGNED_INT,
 		nullptr);
@@ -586,7 +586,7 @@ void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, int ID, bool s
 		glUniform1i(ul("isSelected"), 0);
 
 	// Rajzolási parancs kiadása
-	glDrawElements(GL_TRIANGLES,
+	glDrawElements(GL_TRIANGLE_STRIP,
 		m_surfaceGPU.count,
 		GL_UNSIGNED_INT,
 		nullptr);
@@ -615,7 +615,7 @@ void CMyApp::RenderCircle(glm::mat4& matWorld, glm::vec3& color, int ID)
 		glUniform1i(ul("isSelected"), 0);
 
 	// Rajzolási parancs kiadása
-	glDrawElements(GL_TRIANGLES,
+	glDrawElements(GL_TRIANGLE_STRIP,
 		m_surfaceGPU.count,
 		GL_UNSIGNED_INT,
 		nullptr);
@@ -875,6 +875,7 @@ void CMyApp::Resize(int _w, int _h)
 	// because now we want the two framebuffer (default,ours) to be the same resolution
 	CleanResolutionDependentResources();
 	InitResolutionDependentResources(_w, _h);
+	m_needFreshFboByMouse = true;
 }
 
 // Le nem kezelt, egzotikus esemény kezelése

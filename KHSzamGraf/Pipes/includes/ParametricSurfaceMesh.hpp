@@ -61,3 +61,49 @@ template <typename SurfT>
     
         return outputMesh;
 }
+
+template <typename SurfT>
+[[nodiscard]] MeshObject<Vertex> GetParamSurfMeshForStrip(const SurfT& surf, const std::size_t N = 80, const std::size_t M = 40)
+{
+	MeshObject<Vertex> outputMesh;
+
+	// NxM darab négyszöggel közelítjük a parametrikus felületünket => (N+1)x(M+1) pontban kell kiértékelni
+	outputMesh.vertexArray.resize((N + 1) * (M + 1));
+
+
+	for (std::size_t j = 0; j <= M; ++j)
+	{
+		for (std::size_t i = 0; i <= N; ++i)
+		{
+			float u = i / (float)N;
+			float v = j / (float)M;
+
+			std::size_t index = i + j * (N + 1);
+			outputMesh.vertexArray[index].position = surf.GetPos(u, v);
+			outputMesh.vertexArray[index].normal = surf.GetNorm(u, v);
+			outputMesh.vertexArray[index].texcoord = surf.GetTex(u, v);
+		}
+	}
+
+
+
+	outputMesh.indexArray.reserve((N + 1) * 2 * M);
+
+	for (std::size_t j = 0; j < M; ++j)
+	{
+		for (std::size_t i = 0; i <= N; ++i)
+		{
+			// Add vertices in reversed order for correct winding
+			outputMesh.indexArray.push_back(static_cast<GLuint>(i + (j + 1) * (N + 1))); // Vertex from the next row
+			outputMesh.indexArray.push_back(static_cast<GLuint>(i + j * (N + 1)));       // Vertex from the current row
+		}
+		// Insert degenerate triangles to connect rows
+		if (j < M - 1)
+		{
+			outputMesh.indexArray.push_back(static_cast<GLuint>(N + (j + 1) * (N + 1))); // Last vertex of the next row
+			outputMesh.indexArray.push_back(static_cast<GLuint>(0 + (j + 1) * (N + 1))); // First vertex of the next row
+		}
+	}
+
+	return outputMesh;
+}
