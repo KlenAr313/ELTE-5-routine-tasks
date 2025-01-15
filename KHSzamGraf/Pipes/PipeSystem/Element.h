@@ -6,7 +6,7 @@
 class Element
 {
 public:
-	Element(int px,int py,int pz,int fx, int fy, int fz, glm::vec3 color, bool isSphere, bool isBegin = false, bool isEnd = false, int pfx = 0, int pfy = 0, int pfz = 0);
+	Element(int px,int py,int pz,int fx, int fy, int fz, glm::vec3 color, int ID, bool isSphere, bool isBegin = false, bool isEnd = false, int pfx = 0, int pfy = 0, int pfz = 0);
 	~Element();
 
 	glm::mat4 posRot = glm::identity<glm::mat4>();
@@ -15,6 +15,7 @@ public:
 	const bool isSphere;
 	const bool isBegin;
 	const bool isEnd;
+	const int ID;
 
 
 private:

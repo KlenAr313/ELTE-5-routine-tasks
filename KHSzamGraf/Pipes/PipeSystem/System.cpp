@@ -2,7 +2,6 @@
 
 System::System(int size, int pipeCount): elements(0), pipeCount(pipeCount), gridSize(size)
 {
-
 	std::srand(std::time(nullptr));
 	availability.reserve(size * size * size);
 	for (int i = 0; i < size*size*size; ++i)
@@ -18,6 +17,7 @@ System::System(int size, int pipeCount): elements(0), pipeCount(pipeCount), grid
 		Builder* builder = new Builder(availability, gridSize, freshElements, colorRandomiser(), canContinue, noMoreSpace);
 		if (!noMoreSpace)
 		{
+			elementIDs.push_back(builder->ID);
 			if (!canContinue)
 			{
 				delete(builder);
@@ -59,6 +59,7 @@ void System::next()
 		Builder* builder = new Builder(availability, gridSize, freshElements, colorRandomiser(), canContinue, noMoreSpace);
 		if (!noMoreSpace)
 		{
+			elementIDs.push_back(builder->ID);
 			if (!canContinue)
 			{
 				delete(builder);

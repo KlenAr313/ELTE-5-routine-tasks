@@ -5,7 +5,7 @@
 #include <iostream>
 
 Builder::Builder(std::vector<bool>& availability, int gridSize, std::vector<Element*>& freshElements, glm::vec3 col, bool& canContinue, bool& noMoreSpace)
-	:availability(availability), gridSize(gridSize), freshElements(freshElements)
+	:availability(availability), gridSize(gridSize), freshElements(freshElements), ID(allID++)
 {
 	this->color = glm::vec3(col);
 	std::vector<int> possAvail;
@@ -57,12 +57,12 @@ Builder::Builder(std::vector<bool>& availability, int gridSize, std::vector<Elem
 
 			availability[toIndex(px + fx, py + fy, pz + fz)] = false;
 
-			Element* e = new Element(px, py, pz, fx, fy, fz, color, true, true, false); //begin can continue
+			Element* e = new Element(px, py, pz, fx, fy, fz, color, ID, true, true, false); //begin can continue
 			freshElements.push_back(e);
 		}
 		else
 		{
-			Element* e = new Element(px, py, pz, 1, 1, 1, color, true, true, true); //begin can't continue
+			Element* e = new Element(px, py, pz, 1, 1, 1, color, ID, true, true, true); //begin can't continue
 			freshElements.push_back(e);
 			canContinue = false;
 		}
@@ -115,12 +115,12 @@ bool Builder::next()
 				fz = way.z;
 
 
-				Element* e = new Element(px, py, pz, fx, fy, fz, color, true, false, false, pfx, pfy, pfz); //middle
+				Element* e = new Element(px, py, pz, fx, fy, fz, color, ID, true, false, false, pfx, pfy, pfz); //middle
 				freshElements.push_back(e);
 			}
 			else
 			{
-				Element* e = new Element(px, py, pz, fx, fy, fz, color, false); //cylinder
+				Element* e = new Element(px, py, pz, fx, fy, fz, color, ID, false); //cylinder
 				freshElements.push_back(e);
 			}
 
@@ -129,7 +129,7 @@ bool Builder::next()
 		}
 		else
 		{
-			Element* e = new Element(px, py, pz, 1, 1, 1, color, true, false, true, pfx, pfy, pfz); //end, can't continue
+			Element* e = new Element(px, py, pz, 1, 1, 1, color, ID, true, false, true, pfx, pfy, pfz); //end, can't continue
 			//TODO cannot pushback e; Seems solved don't know why
 			freshElements.push_back(e);
 			return false;
@@ -137,7 +137,7 @@ bool Builder::next()
 	}
 	else
 	{
-		Element* e = new Element(px, py, pz, fx, fy, fz, color, false); //cylinder
+		Element* e = new Element(px, py, pz, fx, fy, fz, color, ID, false); //cylinder
 		freshElements.push_back(e);
 		availability[toIndex(px + fx, py + fy, pz + fz)] = false;
 		return true;
@@ -160,3 +160,5 @@ bool Builder::isIn(int a)
 {
 	return a >= 0 && a < gridSize;
 }
+
+int Builder::allID = 0;

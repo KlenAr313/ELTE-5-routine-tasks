@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <ctime>
+#include <string>
 #include "Element.h"
 #include "Builder.h"
 
@@ -15,6 +16,7 @@ public:
 
 	std::vector<Element*> elements;
 	std::vector<Element*> freshElements;
+	std::vector<int> elementIDs;
 
 	int closedBuilderCount = 0;
 

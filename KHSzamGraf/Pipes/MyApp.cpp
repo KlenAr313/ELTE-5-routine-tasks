@@ -420,24 +420,24 @@ void CMyApp::Render()
 		{
 			if (element->isSphere)
 			{
-				RenderSphere(element->posRot, element->color);
+				RenderSphere(element->posRot, element->color, element->ID);
 
 				if (!element->isEnd)
 				{
-					RenderCylinder(element->posRot, element->color, true);
-					RenderCircle(element->posRot, element->color);
+					RenderCylinder(element->posRot, element->color, element->ID, true);
+					RenderCircle(element->posRot, element->color, element->ID);
 				}
 
 				if (!element->isBegin)
 				{
-					RenderCylinder(element->prevPosRot, element->color, true);
-					RenderCircle(element->posRot, element->color);
+					RenderCylinder(element->prevPosRot, element->color, element->ID, true);
+					RenderCircle(element->posRot, element->color, element->ID);
 				}
 			}
 			else
 			{
-				RenderCylinder(element->posRot, element->color, false);
-				RenderCircle(element->posRot, element->color);
+				RenderCylinder(element->posRot, element->color, element->ID, false);
+				RenderCircle(element->posRot, element->color, element->ID);
 			}
 		}
 
@@ -470,24 +470,24 @@ void CMyApp::Render()
 		{
 			if (element->isSphere)
 			{
-				RenderSphere(element->posRot, element->color);
+				RenderSphere(element->posRot, element->color, element->ID);
 
 				if (!element->isEnd)
 				{
-					RenderCylinder(element->posRot, element->color, true);
-					RenderCircle(element->posRot, element->color);
+					RenderCylinder(element->posRot, element->color, element->ID, true);
+					RenderCircle(element->posRot, element->color, element->ID);
 				}
 
 				if (!element->isBegin)
 				{
-					RenderCylinder(element->prevPosRot, element->color, true);
-					RenderCircle(element->posRot, element->color);
+					RenderCylinder(element->prevPosRot, element->color, element->ID, true);
+					RenderCircle(element->posRot, element->color, element->ID);
 				}
 			}
 			else
 			{
-				RenderCylinder(element->posRot, element->color, false);
-				RenderCircle(element->posRot, element->color);
+				RenderCylinder(element->posRot, element->color, element->ID, false);
+				RenderCircle(element->posRot, element->color, element->ID);
 			}
 		}
 
@@ -517,7 +517,7 @@ void CMyApp::Render()
 
 }
 
-void CMyApp::RenderSphere(glm::mat4& matWorld, glm::vec3& color)
+void CMyApp::RenderSphere(glm::mat4& matWorld, glm::vec3& color, int ID)
 {
 	glUseProgram(m_Sphere_programID);
 
@@ -531,6 +531,11 @@ void CMyApp::RenderSphere(glm::mat4& matWorld, glm::vec3& color)
 
 	SetupLightsAndOther();
 
+	if (ID == m_guiCurrentItem)
+		glUniform1i(ul("isSelected"), 1);
+	else
+		glUniform1i(ul("isSelected"), 0);
+
 	// Rajzolási parancs kiadása
 	glDrawElements(GL_TRIANGLES,
 		m_surfaceGPU.count,
@@ -541,7 +546,7 @@ void CMyApp::RenderSphere(glm::mat4& matWorld, glm::vec3& color)
 	glUseProgram(0);
 }
 
-void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExtend)
+void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, int ID, bool sphereExtend)
 {
 	glUseProgram(m_Cylinder_programID);
 
@@ -559,6 +564,11 @@ void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExt
 
 	SetupLightsAndOther();
 
+	if (ID == m_guiCurrentItem)
+		glUniform1i(ul("isSelected"), 1);
+	else
+		glUniform1i(ul("isSelected"), 0);
+
 	// Rajzolási parancs kiadása
 	glDrawElements(GL_TRIANGLES,
 		m_surfaceGPU.count,
@@ -569,7 +579,7 @@ void CMyApp::RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExt
 	glUseProgram(0);
 }
 
-void CMyApp::RenderCircle(glm::mat4& matWorld, glm::vec3& color)
+void CMyApp::RenderCircle(glm::mat4& matWorld, glm::vec3& color, int ID)
 {
 	glUseProgram(m_Circle_programID);
 
@@ -582,6 +592,11 @@ void CMyApp::RenderCircle(glm::mat4& matWorld, glm::vec3& color)
 	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
 
 	SetupLightsAndOther();
+
+	if (ID == m_guiCurrentItem)
+		glUniform1i(ul("isSelected"), 1);
+	else
+		glUniform1i(ul("isSelected"), 0);
 
 	// Rajzolási parancs kiadása
 	glDrawElements(GL_TRIANGLES,
@@ -717,6 +732,36 @@ void CMyApp::RenderGUI()
 		if (ImGui::Button("Reset"))
 		{
 			m_needNewSystem = true;
+		}
+
+
+		ImGui::SeparatorText("Pipe recoloring");
+		std::vector<int> IDs = pipeSystem->elementIDs;
+		const int idCount = IDs.size();
+		if (ImGui::BeginListBox("Pipe IDs", ImVec2(0.0, 10 * ImGui::GetTextLineHeightWithSpacing())))
+		{
+			for (int i = 0; i < idCount; ++i)
+			{
+				const bool is_seleceted = (m_guiCurrentItem == i); // épp ki van-e jelölve?
+				if (ImGui::Selectable(std::to_string(i).c_str(), is_seleceted))
+				{
+					if (i == m_guiCurrentItem) m_guiCurrentItem = -1; // Ha rákattintottunk, akkor szedjük le a kijelölést
+					else m_guiCurrentItem = i; // Különben jelöljük ki
+					m_needFreshFboByLight = true;
+				}
+
+				// technikai apróság, nem baj ha lemarad.
+				if (is_seleceted)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndListBox();
+		}
+
+		ImGui::SliderFloat3("New Color for Pipe", glm::value_ptr(m_newColor), 0.0f, 1.0f);
+		if (ImGui::Button("Recolor!"))
+		{
+			m_needFreshFboByLight = true;
+			m_guiCurrentItem = -1;
 		}
 	}
 

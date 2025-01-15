@@ -38,9 +38,9 @@ public:
 	void Render();
 	void RenderGUI();
 
-	void RenderSphere(glm::mat4& matWorld, glm::vec3& color);
-	void RenderCylinder(glm::mat4 matWorld, glm::vec3& color, bool sphereExtend);
-	void RenderCircle(glm::mat4& matWorld, glm::vec3& color);
+	void RenderSphere(glm::mat4& matWorld, glm::vec3& color, int ID);
+	void RenderCylinder(glm::mat4 matWorld, glm::vec3& color, int ID, bool sphereExtend);
+	void RenderCircle(glm::mat4& matWorld, glm::vec3& color, int ID);
 	void SetupLightsAndOther();
 
 	void RenderSkyBox();
@@ -140,9 +140,14 @@ protected:
 	void InitResolutionDependentResources(int, int);
 	void CleanResolutionDependentResources();
 
+	// Checks for fresh fbo
 	bool m_needFreshFboByKey{true};
 	bool m_needFreshFboByMouse{true};
 	bool m_needFreshFboByLight{true};
 	bool m_freshPipes{ true };
+
+	//imGui
+	int m_guiCurrentItem = -1;
+	glm::vec3 m_newColor = glm::vec3(0.0,0.0,0.0);
 };
 

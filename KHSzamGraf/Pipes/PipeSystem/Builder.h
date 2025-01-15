@@ -12,17 +12,19 @@ public:
 	int toIndex(int x, int y, int z);
 	bool isIn(int a);
 	bool next();
+	const int ID;
 
 private:
+	static int allID;
 	//current position
-	int px;
-	int py;
-	int pz;
+	int px = 0;
+	int py = 0;
+	int pz = 0;
 
 	//faceing direction
-	int fx;
-	int fy;
-	int fz;
+	int fx = 0;
+	int fy = 0;
+	int fz = 0;
 
 	int gridSize;
 
