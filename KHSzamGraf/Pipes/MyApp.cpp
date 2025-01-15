@@ -8,7 +8,21 @@
 
 CMyApp::CMyApp()
 {
-
+	/*
+	Alapfeladat:
+		- Generálás
+		- Additív rajzolás
+	Opcionális feladatok:
+		- Több cső, állítható sebesség
+		- Lighting
+		- Reset
+		- Builder count setting
+		- Select and recolour
+	FBO:
+		- Depth of field
+	Param felületek:
+		-Triangle Strip
+	*/
 }
 
 CMyApp::~CMyApp()
@@ -388,7 +402,7 @@ void CMyApp::Update( const SUpdateInfo& updateInfo )
 			pipeSystem->reColorAt(m_reColorAt, m_newColor);
 			m_colorChange = false;
 		}
-		pipeSystem->next();
+		pipeSystem->next(m_builderCount);
 		prevActionTime = m_ElapsedTimeInSec;
 		m_freshPipes = true;
 	}
@@ -396,7 +410,7 @@ void CMyApp::Update( const SUpdateInfo& updateInfo )
 	if (m_needNewSystem)
 	{
 		delete(pipeSystem);
-		pipeSystem = new System(m_gridSize, 10);
+		pipeSystem = new System(m_gridSize, m_builderCount);
 		m_needNewSystem = false;
 		m_needFreshFboByLight = true;
 	}
@@ -723,6 +737,7 @@ void CMyApp::RenderGUI()
 		ImGui::SliderFloat( "Linear Attenuation", &m_lightLinearAttenuation, 0.001f, 2.0f );
 		ImGui::SliderFloat( "Quadratic Attenuation", &m_lightQuadraticAttenuation, 0.001f, 2.0f );*/
 
+		ImGui::SeparatorText("Lightning position");
 		static glm::vec2 lightPosXZ = glm::vec2(0.0f);
 		lightPosXZ = glm::vec2(m_lightPos.x, m_lightPos.z);
 		if (ImGui::SliderFloat2("Light Position XZ", glm::value_ptr(lightPosXZ), -1.0f, 1.0f))
@@ -741,15 +756,17 @@ void CMyApp::RenderGUI()
 		}
 		ImGui::LabelText("Light Position Y", "%f", m_lightPos.y);
 
+		ImGui::SeparatorText("Generation Data");
 		ImGui::SliderFloat("Generation Time", &generationTime, 0.001f, 5.0f);
 
-		ImGui::DragInt("GridSize", &m_gridSize, 1.0F, 5, 128);
+		ImGui::DragInt("Grid Size", &m_gridSize, 1.0F, 5, 128);
 
 		if (ImGui::Button("Reset"))
 		{
 			m_needNewSystem = true;
 		}
 
+		ImGui::DragInt("Builder Count", &m_builderCount, 1.0F, 0, 20);
 
 		ImGui::SeparatorText("Pipe recoloring");
 		std::vector<int> IDs = pipeSystem->elementIDs;

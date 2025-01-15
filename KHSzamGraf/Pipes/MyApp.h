@@ -126,6 +126,7 @@ protected:
 	float prevActionTime = 0;
 	float generationTime = 1.0;
 	int m_gridSize = 10;
+	int m_builderCount = 5;
 	bool m_needNewSystem{ false };
 	int m_reColorAt = -1;
 

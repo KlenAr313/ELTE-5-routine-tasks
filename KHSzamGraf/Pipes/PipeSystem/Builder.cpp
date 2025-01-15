@@ -51,9 +51,9 @@ Builder::Builder(std::vector<bool>& availability, int gridSize, std::vector<Elem
 		{
 			glm::vec3 way = ways[std::rand() % ways.size()];
 
-			fx = way.x;
-			fy = way.y;
-			fz = way.z;
+			fx = static_cast<int>(way.x);
+			fy = static_cast<int>(way.y);
+			fz = static_cast<int>(way.z);
 
 			availability[toIndex(px + fx, py + fy, pz + fz)] = false;
 
@@ -108,11 +108,11 @@ bool Builder::next()
 		{
 			glm::vec3 way = ways[std::rand() % ways.size()];
 
-			if (!(fx == way.x && fy == way.y && fz == way.z))
+			if (!(fx == static_cast<int>(way.x) && fy == static_cast<int>(way.y) && fz == static_cast<int>(way.z)))
 			{
-				fx = way.x;
-				fy = way.y;
-				fz = way.z;
+				fx = static_cast<int>(way.x);
+				fy = static_cast<int>(way.y);
+				fz = static_cast<int>(way.z);
 
 
 				Element* e = new Element(px, py, pz, fx, fy, fz, color, ID, true, false, false, pfx, pfy, pfz); //middle
@@ -146,9 +146,14 @@ bool Builder::next()
 
 }
 
+void Builder::end()
+{
+	availability[toIndex(px + fx, py + fy, pz + fz)] = true;
+}
+
 Builder::~Builder()
 {
-	std::cout << "Builder killed" << std::endl;
+	//std::cout << "Builder killed" << std::endl;
 }
 
 int Builder::toIndex(int x, int y, int z)

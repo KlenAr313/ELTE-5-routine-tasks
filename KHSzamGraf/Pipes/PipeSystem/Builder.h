@@ -12,6 +12,7 @@ public:
 	int toIndex(int x, int y, int z);
 	bool isIn(int a);
 	bool next();
+	void end();
 	static void resetIds();
 
 	const int ID;

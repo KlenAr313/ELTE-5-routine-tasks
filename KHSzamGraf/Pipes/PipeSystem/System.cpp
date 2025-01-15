@@ -30,7 +30,7 @@ System::System(int size, int pipeCount): elements(0), pipeCount(pipeCount), grid
 	}
 }
 
-void System::next()
+void System::next(int nextCount)
 {
 	for (auto element : freshElements)
 	{
@@ -39,7 +39,7 @@ void System::next()
 
 	freshElements.erase(freshElements.begin(), freshElements.end());
 
-	int cloasedBuilderCountInRound = 0;
+	int closedBuilderCountInRound = 0;
 	for (int i = 0; i < builders.size(); ++i)
 	{
 		bool canContinue = builders[i]->next();
@@ -47,11 +47,33 @@ void System::next()
 		{
 			delete(builders[i]);
 			builders[i] = nullptr;
-			++cloasedBuilderCountInRound;
+			++closedBuilderCountInRound;
 		}
 	}
 
 	builders.erase(std::remove_if(builders.begin(), builders.end(), [](Builder* x) { return x == nullptr; }), builders.end());
+	
+	if (builders.size() > nextCount && closedBuilderCountInRound > builders.size() - nextCount)
+	{
+		closedBuilderCountInRound -= static_cast<int>(builders.size()) - nextCount;
+	}
+	else
+	{
+		closedBuilderCountInRound = 0;
+	}
+
+	while (builders.size() > nextCount)
+	{
+		builders[builders.size() - 1]->end();
+		delete(builders[builders.size() - 1]);
+		builders.pop_back();
+	}
+	
+	if (builders.size() < nextCount)
+	{
+		closedBuilderCount += nextCount - static_cast<int>(builders.size());
+	}
+
 
 	for (int i = 0; i < closedBuilderCount; ++i)
 	{
@@ -64,14 +86,14 @@ void System::next()
 			if (!canContinue)
 			{
 				delete(builder);
-				++cloasedBuilderCountInRound;
+				++closedBuilderCountInRound;
 			}
 			else builders.push_back(builder);
 		}
 		else delete(builder);
 	}
 
-	closedBuilderCount = cloasedBuilderCountInRound;
+	closedBuilderCount = closedBuilderCountInRound;
 }
 
 void System::reColorAt(int at, glm::vec3 freshColor)

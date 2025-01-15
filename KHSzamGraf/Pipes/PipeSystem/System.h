@@ -11,7 +11,7 @@ public:
 	System(int size, int pipeCount);
 	~System();
 
-	void next();
+	void next(int builderCount);
 	void reColorAt(int at, glm::vec3 color);
 
 	std::vector<Element*> elements;
@@ -29,4 +29,5 @@ protected:
 	std::vector<bool> availability;
 
 	std::vector<Builder*> builders;
+	int builderCount;
 };
