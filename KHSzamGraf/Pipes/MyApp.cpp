@@ -418,7 +418,8 @@ void CMyApp::Update( const SUpdateInfo& updateInfo )
 
 void CMyApp::Render()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer); 
+	glDepthRange(0.0, 1.0);
 
 
 	if (m_needFreshFboByMouse || m_needFreshFboByKey || m_needFreshFboByLight || m_colorChangeForFbo)

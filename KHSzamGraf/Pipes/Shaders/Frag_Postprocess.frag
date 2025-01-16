@@ -18,7 +18,7 @@ void main()
 	//fs_out_col = texture(frameTex, vs_out_tex);
 
     float depth = texture(depthTex, vs_out_tex).r;
-    int k = 1;
+    int k = 0;
     if(depth < 4.0)
     {
         k = int( floor( 4.0 - ((depth / 2.0) * (depth / 2.0))));
@@ -37,7 +37,9 @@ void main()
  	}
  	col /= float((2*k+1)*(2*k+1));
  
- 	vec4 originalColor = vec4(col,1);
+ 	vec4 originalColor = vec4(vec3(col),1);
 
- 	fs_out_col = originalColor;
+ 	//fs_out_col = originalColor;
+ 	//fs_out_col = vec4(vec3(depth),1);;
+ 	fs_out_col = texture(frameTex, vs_out_tex);
 }
