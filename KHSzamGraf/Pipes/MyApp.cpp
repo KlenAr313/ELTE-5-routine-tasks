@@ -254,7 +254,7 @@ void CMyApp::InitResolutionDependentResources(int width, int height)
 
 void CMyApp::CleanResolutionDependentResources()
 {
-	glDeleteRenderbuffers(1, &m_depthBuffer);
+	glDeleteTextures(1, &m_depthBuffer);
 	glDeleteTextures(1, &m_colorBuffer);
 }
 
